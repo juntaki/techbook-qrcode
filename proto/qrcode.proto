@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package qrcode;
+
+message URL { string url = 1; }
+
+message QRCode {
+  string id = 1;
+  string url = 2;
+  bytes image = 3;
+}
+
+message QRCodeList { repeated QRCode QRCodes = 1; }
+
+message Empty {}
+
+service QRCodeService {
+  rpc GetURL(Empty) returns (URL) {}
+  rpc UpdateURL(URL) returns (Empty) {}
+  rpc GetQRCodes(Empty) returns (QRCodeList) {}
+  rpc AddQRCodes(Empty) returns (Empty) {}
+}

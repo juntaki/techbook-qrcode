@@ -1,0 +1,44 @@
+.panel {
+  display: inline-block;
+  font-size: 0;
+}
+
+.row {
+  display: inline-block;
+}
+
+.card {
+  width: 91mm;
+  height: 55mm;
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  overflow: hidden;
+}
+
+@media screen {
+  .card {
+    border: dotted gray 1px;
+  }
+}
+
+.card-content {
+  text-align: center;
+  padding: 7mm;
+  font-size: 8px;
+  white-space: pre-wrap;
+}
+
+@media print {
+  .no_print {
+    display: none;
+  }
+}
+
+.qrcode {
+  -ms-interpolation-mode: nearest-neighbor; /* IE8+ */
+  image-rendering: -webkit-optimize-contrast; /* Safari (WebKit) */
+  image-rendering: -moz-crisp-edges; /* Firefox (Gecko) */
+  image-rendering: -o-crisp-edges; /* Opera 12.x */
+  image-rendering: pixelated; /* Chrome 41+, Opera 29+ (CSS4) */
+}
