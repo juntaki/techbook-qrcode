@@ -88,9 +88,10 @@ const App = () => {
             },
             [[]]
           )
-          .map(dd => {
+          .map((dd, i) => {
+            const rowClass = "row" + (i % 5 == 0 ? " row-pagebreak" : "");
             return (
-              <div className="row">
+              <div className={rowClass}>
                 {dd.map((d, i) => {
                   const blob = new Blob([d.image], { type: "image/png" });
                   return (

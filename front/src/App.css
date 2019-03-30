@@ -1,10 +1,9 @@
 .panel {
-  display: inline-block;
   font-size: 0;
 }
 
-.row {
-  display: inline-block;
+.row-pagebreak {
+  page-break-before: always;
 }
 
 .card {
