@@ -19,6 +19,7 @@ USE `mydb` ;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `mydb`.`qrcode` (
   `id` CHAR(36) NOT NULL COMMENT 'ID',
+  `index` INT NOT NULL COMMENT 'Index',
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 

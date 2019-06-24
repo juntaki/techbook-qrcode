@@ -2,10 +2,11 @@ package infra
 
 import (
 	"context"
+	"github.com/juntaki/techbook-qrcode/src/infra/models"
 
 	"cloud.google.com/go/datastore"
-	"github.com/google/uuid"
 	"github.com/juntaki/techbook-qrcode/src/domain"
+	"gopkg.in/gorp.v2"
 )
 
 type QRCodeRepositoryDatastoreImpl struct {
@@ -37,22 +38,6 @@ func (i *QRCodeRepositoryDatastoreImpl) IsExistQRCode(ctx context.Context, code 
 	return true
 }
 
-func (i *QRCodeRepositoryDatastoreImpl) GenerateQRCodes(ctx context.Context, len int) error {
-	keys := make([]*datastore.Key, len)
-	qrs := make([]*domain.QRCode, len)
-	for i := range qrs {
-		id := uuid.Must(uuid.NewRandom()).String()
-		qrs[i] = &domain.QRCode{ID: id}
-		keys[i] = datastore.NameKey("QRCode", id, nil)
-	}
-
-	_, err := i.db.PutMulti(ctx, keys, qrs)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (i *QRCodeRepositoryDatastoreImpl) SaveQRCodes(ctx context.Context, qrs []*domain.QRCode) error {
 	keys := make([]*datastore.Key, len(qrs))
 	for i, qr := range qrs {
@@ -61,6 +46,55 @@ func (i *QRCodeRepositoryDatastoreImpl) SaveQRCodes(ctx context.Context, qrs []*
 	_, err := i.db.PutMulti(ctx, keys, qrs)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+type QRCodeRepositorySQLImpl struct {
+	db *gorp.DbMap
+}
+
+func NewQRCodeRepositorySQLImpl(db *gorp.DbMap) domain.QRCodeRepository {
+	return &QRCodeRepositorySQLImpl{
+		db: db,
+	}
+}
+
+func (i *QRCodeRepositorySQLImpl) GetQRCodes(ctx context.Context) ([]*domain.QRCode, error) {
+	var m []*models.Qrcode
+	_, err := i.db.Select(&m, "select * from qrcode order by index asc")
+	if err != nil {
+		return nil, err
+	}
+
+	var ret []*domain.QRCode
+	for _, mm := range m {
+		ret = append(ret, &domain.QRCode{
+			ID:    mm.Id,
+			Index: mm.Index,
+		})
+	}
+	return ret, nil
+}
+
+func (i *QRCodeRepositorySQLImpl) IsExistQRCode(ctx context.Context, code *domain.QRCode) bool {
+	c, err := i.db.SelectInt("select count(*) from qrcode where id = ?", code.ID)
+	if err != nil || c == 0 {
+		return false
+	}
+	return true
+}
+
+func (i *QRCodeRepositorySQLImpl) SaveQRCodes(ctx context.Context, qrs []*domain.QRCode) error {
+	for _, q := range qrs {
+		m := &models.Qrcode{
+			Id:    q.ID,
+			Index: q.Index,
+		}
+		err := i.db.Insert(m)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

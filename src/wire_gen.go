@@ -9,6 +9,7 @@ import (
 	"cloud.google.com/go/datastore"
 	"github.com/juntaki/techbook-qrcode/src/application"
 	"github.com/juntaki/techbook-qrcode/src/infra"
+	"gopkg.in/gorp.v2"
 )
 
 // Injectors from wire.go:
@@ -23,6 +24,20 @@ func InitializeQRCodeServiceServer(db *datastore.Client) *application.QRCodeServ
 func InitializeTechBookServer(db *datastore.Client) *application.TechBookServer {
 	techBookRepository := infra.NewTechBookRepositoryDatastoreImpl(db)
 	qrCodeRepository := infra.NewQRCodeRepositoryDatastoreImpl(db)
+	techBookServer := application.NewTechBookServer(techBookRepository, qrCodeRepository)
+	return techBookServer
+}
+
+func InitializeQRCodeServiceServerSQL(db *gorp.DbMap) *application.QRCodeServiceServer {
+	qrCodeRepository := infra.NewQRCodeRepositorySQLImpl(db)
+	techBookRepository := infra.NewTechBookRepositorySQLImpl(db)
+	qrCodeServiceServer := application.NewQRCodeServiceServer(qrCodeRepository, techBookRepository)
+	return qrCodeServiceServer
+}
+
+func InitializeTechBookServerSQL(db *gorp.DbMap) *application.TechBookServer {
+	techBookRepository := infra.NewTechBookRepositorySQLImpl(db)
+	qrCodeRepository := infra.NewQRCodeRepositorySQLImpl(db)
 	techBookServer := application.NewTechBookServer(techBookRepository, qrCodeRepository)
 	return techBookServer
 }
